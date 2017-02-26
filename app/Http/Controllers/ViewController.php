@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Session;
 
+use Illuminate\Http\Request;
+use App\Mahasiswa;
 class ViewController extends Controller
 {
     /**
@@ -11,12 +13,14 @@ class ViewController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+	 public function __construct()
+    {
+        $this->middleware('auth');
+    }
     public function index()
     {
-		
-		$content1="ini JUDUL";
-		$content2="ini KONTEN";
-        return view ('home')->with('showContent', compact ('content1','content2'));
+		$data=Mahasiswa::all();
+        return view ('home')->with('d', $data);
     }
 
     /**
@@ -27,6 +31,7 @@ class ViewController extends Controller
     public function create()
     {
         //
+		return view('tambah-mahasiswa');
     }
 
     /**
@@ -38,6 +43,16 @@ class ViewController extends Controller
     public function store(Request $request)
     {
         //
+		$mahasiswa = new Mahasiswa;
+		$mahasiswa -> nim = $request->nim;
+		$mahasiswa -> nama = $request->nama;
+		$mahasiswa -> alamat = $request->alamat;
+		$this->validate($request,[
+		'nim'=>'required',
+		'nama'=>'required'
+		]);
+		$mahasiswa ->save();
+		return redirect('/');
     }
 
     /**
@@ -60,6 +75,8 @@ class ViewController extends Controller
     public function edit($id)
     {
         //
+		$mahasiswa = Mahasiswa::find($id);
+		return view('edit-mahasiswa')->with('d',$mahasiswa);
     }
 
     /**
@@ -72,6 +89,12 @@ class ViewController extends Controller
     public function update(Request $request, $id)
     {
         //
+		$mahasiswa = Mahasiswa::find($id);
+		$mahasiswa -> nim = $request->nim;
+		$mahasiswa -> nama = $request->nama;
+		$mahasiswa -> alamat = $request->alamat;
+		$mahasiswa ->save();
+		return redirect('/');
     }
 
     /**
@@ -83,5 +106,8 @@ class ViewController extends Controller
     public function destroy($id)
     {
         //
+		$mahasiswa = Mahasiswa::find($id);
+		$mahasiswa ->delete();
+		return redirect('/');
     }
 }
